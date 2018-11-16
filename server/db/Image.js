@@ -27,7 +27,7 @@ Image.upload = async function(data, bucketName){
 
     
     image.url = `https://s3.amazonaws.com/${bucketName}/${key}`;
-    await image.save();
+    return await image.save();
   }
   catch(ex){
     throw ex;
