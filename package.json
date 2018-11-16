@@ -6,7 +6,7 @@
   "scripts": {
     "test:dev:server": "npm run test:server -- --watch",
     "test:server": "DATABASE_URL=postgres://localhost/my_db_test mocha tests/server/**/*.js",
-    "test": "npm run test:server",
+    "test": "npm run test:server -- --exit",
     "postinstall": "npm run webpack",
     "webpack": "webpack",
     "build": "npm run webpack -- --watch --mode=development",
