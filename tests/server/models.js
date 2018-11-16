@@ -1,8 +1,9 @@
 const expect = require('chai').expect;
-const { models } = require('../../server/db')
+const { models, syncAndSeed } = require('../../server/db')
 const { Image } = models;
 
 describe('models', ()=> {
+  beforeEach(()=> syncAndSeed()); 
   describe('Image', ()=> {
     it('is ok', ()=> {
       expect(Image).to.be.ok;
