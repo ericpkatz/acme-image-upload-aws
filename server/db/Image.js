@@ -1,4 +1,5 @@
-const S3 = require('../S3');
+const { parseBase64, upload, resize } = require('../imageUtils');
+
 
 const conn = require('./conn');
 const Image = conn.define('image', {
@@ -12,26 +13,20 @@ const Image = conn.define('image', {
   },
 });
 
+
 Image.upload = async function(data, bucketName){
   try{
-    const regex = /data:image\/(\w+);base64,(.*)/
-    const matches = regex.exec(data);
-    const extension = matches[1];
-
     const image = this.build();
-    const Body = new Buffer(matches[2], 'base64');
-    await S3.createBucket({ Bucket: bucketName}).promise();
-    const Key = `${image.id.toString()}.${extension}`;
 
-    await S3.putObject({
-      Bucket: bucketName,
-      ACL: 'public-read',
-      Body,
-      ContentType: `image/${extension}`,
-      Key
-    }).promise();
+    const { buffer, extension } = parseBase64(data);
+
+    const _buffer = await resize(buffer);
+
+    const key = `${image.id.toString()}.${extension}`;
+    await upload(_buffer, extension, key, bucketName);
+
     
-    image.url = `https://s3.amazonaws.com/${bucketName}/${Key}`;
+    image.url = `https://s3.amazonaws.com/${bucketName}/${key}`;
     await image.save();
   }
   catch(ex){
