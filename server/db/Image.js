@@ -12,30 +12,33 @@ const Image = conn.define('image', {
   },
 });
 
-Image.upload = async function(data, bucketName){
-  try{
+Image.upload = function(data, bucketName){
+  return new Promise((resolve, reject)=> {
     const regex = /data:image\/(\w+);base64,(.*)/
     const matches = regex.exec(data);
+    if(!matches){
+      return reject(new Error('BASE64 ERROR'));
+    }
     const extension = matches[1];
-
     const image = this.build();
-    const Body = new Buffer(matches[2], 'base64');
-    await S3.createBucket({ Bucket: bucketName}).promise();
     const Key = `${image.id.toString()}.${extension}`;
-
-    await S3.putObject({
-      Bucket: bucketName,
-      ACL: 'public-read',
-      Body,
-      ContentType: `image/${extension}`,
-      Key
-    }).promise();
-    
-    image.url = `https://s3.amazonaws.com/${bucketName}/${Key}`;
-    await image.save();
-  }
-  catch(ex){
-    throw ex;
-  }
+    const Body = new Buffer(matches[2], 'base64');
+    S3.createBucket({ Bucket: bucketName}).promise()
+      .then(()=> {
+        return S3.putObject({
+          Bucket: bucketName,
+          ACL: 'public-read',
+          Body,
+          ContentType: `image/${extension}`,
+          Key
+        }).promise();
+      })
+      .then( ()=> {
+        image.url = `https://s3.amazonaws.com/${bucketName}/${Key}`;
+        return image.save();
+      })
+      .then( image => resolve(image))
+      .catch( ex => reject(ex));
+  });
 }
 module.exports = Image;
