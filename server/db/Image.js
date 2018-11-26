@@ -14,7 +14,7 @@ const Image = conn.define('image', {
 
 Image.upload = function(data, bucketName){
   return new Promise((resolve, reject)=> {
-    const regex = /data:image\/(\w+);base64,(.*)/
+    const regex = /data:image\/(\w+);base64,(.*)/;
     const matches = regex.exec(data);
     if(!matches){
       return reject(new Error('BASE64 ERROR'));
@@ -40,5 +40,5 @@ Image.upload = function(data, bucketName){
       .then( image => resolve(image))
       .catch( ex => reject(ex));
   });
-}
+};
 module.exports = Image;
