@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:dev": "npm run test:dev:server",
     "test:dev:server": "npm run test:server -- --watch",
     "test:server": "DATABASE_URL=postgres://localhost/aws_test mocha tests/server/**/*.js --exit",
     "test": "npm run test:server",
